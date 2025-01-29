@@ -28,6 +28,6 @@ export default class HabitModel {
     }
   
     save() {
-      localStorage.setItem('habits', JSON.parse(this.habits));
+      localStorage.setItem('habits', JSON.stringify(this.habits));
     }
   }

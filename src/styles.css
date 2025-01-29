@@ -1,0 +1,30 @@
+#app {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  #habit-form {
+    width: 100%;
+    max-width: 600px;
+    margin-bottom: 20px;
+  }
+  
+  #habits-list {
+    width: 100%;
+    max-width: 600px;
+    margin-bottom: 20px;
+  }
+  
+  #chart-container {
+    width: 100%;
+    max-width: 600px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+  }
+  
+  #habit-chart {
+    width: 100%;
+    max-width: 400px;
+  }

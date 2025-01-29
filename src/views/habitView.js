@@ -5,6 +5,7 @@ export default class HabitView {
     this.app = document.getElementById('app');
     this.form = document.getElementById('habit-form');
     this.list = document.getElementById('habits-list');
+    this.chartContainer = document.getElementById('chart-container');
     this.chart = document.getElementById('habit-chart');
   }
 
@@ -24,11 +25,31 @@ export default class HabitView {
                 <option value="monthly">Monthly</option>
               </select>
             </div>
+            <div class="mb-3">
+              <label for="taskType">Task Type:</label>
+              <select class="form-select" name="type">
+                <option value="complete">Complete</option>
+                <option value="increment">Increment</option>
+              </select>
+            </div>
+            <div class="mb-3" id="goal-container" style="display: none;">
+              <input type="number" class="form-control" name="goal" placeholder="Goal number">
+            </div>
             <button type="submit" class="btn btn-primary">Add Habit</button>
           </form>
         </div>
       </div>
     `;
+
+    const typeSelect = this.form.querySelector('select[name="type"]');
+    typeSelect.addEventListener('change', (event) => {
+      const goalContainer = this.form.querySelector('#goal-container');
+      if (event.target.value === 'increment') {
+        goalContainer.style.display = 'block';
+      } else {
+        goalContainer.style.display = 'none';
+      }
+    });
   }
 
   renderHabits(habits) {
@@ -38,26 +59,51 @@ export default class HabitView {
           <div class="d-flex justify-content-between align-items-center">
             <div>
               <h5 class="card-title">${habit.name}</h5>
-              <h6 class="card-subtitle mb-2 text-muted">${habit.frequency}</h6>
+              <p class="card-text">${habit.frequency}</p>
+              ${habit.type === 'increment' ? `<canvas id="pie-chart-${habit.id}" width="50" height="50"></canvas>` : ''}
             </div>
             <div>
-              <button class="btn btn-success btn-sm complete" data-id="${habit.id}">
-                Complete
-              </button>
-              <button class="btn btn-danger btn-sm delete" data-id="${habit.id}">
-                Delete
-              </button>
+              ${habit.type === 'increment' ? `<input type="number" class="form-control mb-2" id="increment-${habit.id}" placeholder="Increment by">` : ''}
+              <button class="btn btn-success complete" data-id="${habit.id}">Complete</button>
+              <button class="btn btn-danger delete" data-id="${habit.id}">Delete</button>
             </div>
           </div>
         </div>
       </div>
     `).join('');
+
+    habits.forEach(habit => {
+      if (habit.type === 'increment') {
+        this.renderPieChart(habit);
+      }
+    });
+  }
+
+  renderPieChart(habit) {
+    const ctx = document.getElementById(`pie-chart-${habit.id}`).getContext('2d');
+    new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels: ['Completed', 'Remaining'],
+        datasets: [{
+          data: [habit.progress, habit.goal - habit.progress],
+          backgroundColor: ['#4caf50', '#f44336']
+        }]
+      },
+      options: {
+        responsive: false,
+        plugins: {
+          legend: {
+            display: false
+          }
+        }
+      }
+    });
   }
 
   renderChart(habits) {
     if (habits.length === 0) return;
 
-    // Get and destroy existing chart if it exists
     const existingChart = Chart.getChart(this.chart);
     if (existingChart) {
       existingChart.destroy();
@@ -74,7 +120,7 @@ export default class HabitView {
         }).reverse(),
         datasets: habits.map(habit => ({
           label: habit.name,
-          data: habit.progress.map(p => p.completed ? 1 : 0),
+          data: habit.type === 'increment' ? [habit.progress / habit.goal] : habit.progress.map(p => (p.completed ? 1 : 0)),
           fill: false,
           tension: 0.1
         }))
@@ -82,9 +128,7 @@ export default class HabitView {
       options: {
         responsive: true,
         plugins: {
-          legend: {
-            position: 'top',
-          }
+          // ...existing options...
         }
       }
     });

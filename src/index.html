@@ -1,32 +1,22 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Habit Cracker</title>
-  <meta name="viewport" content="width=device-width, initial-sclae=1">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Habit Tracker</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <div id="app">
-    <nav class="navbar navbar-dark bg-primary mb-4 ">
-      <div class="container">
-        <span class="navbar-brand mb-0 h1">Habit Tracker</span>
-      </div>
-    </nav>
-    <div class="container">
-      <div class="row">
-        <div class="col-md-6">
-          <section id="habit-form" class="mb-4"></section>
-          <section id="habits-list"></section>
-        </div>
-        <div class="col-md-6">
-            <section id="progress-chart" class="card">
-                <div class="card-body">
-                  <h5 class="card-title">Progress Chart</h5>
-                  <canvas id="habit-chart"></canvas>
-                </div>
-            </section>
-        </div>
-      </div>
+    <h1>Habit Cracker</h1>
+    <div id="habit-form"></div>
+    <div id="habits-list"></div>
+    <div id="chart-container">
+      <canvas id="habit-chart"></canvas>
     </div>
   </div>
+  
+  <script src="path/to/Chart.min.js"></script>
+  <script type="module" src="main.js"></script>
 </body>
 </html>

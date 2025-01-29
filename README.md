@@ -1,4 +1,21 @@
-# Hello World Welcome to my Habit tracker
+### Hello World Welcome to my Habit tracker
+
+# Habit Cracker
+
+Habit Cracker is a web application that helps you track your habits. You can create habits with different frequencies and types, and track your progress over time.
+
+## Features
+
+- Add new habits with a name, frequency, and type.
+- Two types of habits:
+  - Complete: Mark the habit as complete.
+  - Increment: Increment the habit progress towards a goal.
+- View a list of all habits.
+- Delete habits.
+- View progress charts:
+  - Line chart showing progress over time.
+  - Pie chart showing completion percentage for increment habits.
+
 
 ## Installation
 

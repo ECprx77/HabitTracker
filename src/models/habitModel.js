@@ -20,7 +20,7 @@ export default class HabitModel {
     }
   
     updateProgress(id, date, completed) {
-      const Habit = this.habits.find(h => h.id === id);
+      const habit = this.habits.find(h => h.id === id);
       if (habit) {
         habit.progress.push({ date, completed });
         this.save();

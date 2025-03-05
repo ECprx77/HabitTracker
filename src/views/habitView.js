@@ -7,6 +7,7 @@ export default class HabitView {
     this.list = document.getElementById('habits-list');
     this.chartContainer = document.getElementById('chart-container');
     this.chart = document.getElementById('habit-chart');
+    this.completedTasksDiv = document.getElementById('CompletedTask');
   }
 
   renderForm() {
@@ -59,15 +60,45 @@ export default class HabitView {
           <div class="d-flex justify-content-between align-items-center">
             <div>
               <h5 class="card-title">${habit.name}</h5>
-              <p class="card-text">${habit.frequency}</p>
-              ${habit.type === 'increment' ? `<canvas id="pie-chart-${habit.id}" width="50" height="50"></canvas>` : ''}
+              <p class="card-text">
+                Frequency: ${habit.frequency}
+                <br>
+                Next due: ${habit.nextDueDate ? new Date(habit.nextDueDate).toLocaleDateString() : 'One-time'}
+                ${habit.type === 'increment' ? 
+                  `<br>Progress: ${habit.progress}/${habit.goal}` : 
+                  `<br>Status: ${habit.progress.length > 0 ? 'In Progress' : 'Not Started'}`
+                }
+              </p>
+              ${habit.type === 'increment' ? 
+                `<canvas id="pie-chart-${habit.id}" width="50" height="50"></canvas>` : 
+                ''
+              }
             </div>
-            <div>
-              ${habit.type === 'increment' ? `<input type="number" class="form-control mb-2" id="increment-${habit.id}" placeholder="Increment by">` : ''}
-              <button class="btn btn-success complete" data-id="${habit.id}">Complete</button>
-              <button class="btn btn-danger delete" data-id="${habit.id}">Delete</button>
+            <div class="d-flex flex-column align-items-end">
+              ${habit.type === 'increment' ? `
+                <div class="mb-2">
+                  <input type="number" 
+                    class="form-control" 
+                    id="increment-${habit.id}" 
+                    placeholder="Increment by"
+                    min="1" 
+                    value="1"
+                  >
+                </div>
+              ` : ''}
+              <div class="btn-group">
+                <button class="btn btn-success complete" data-id="${habit.id}">
+                  ${habit.type === 'increment' ? 'Add Progress' : 'Complete'}
+                </button>
+                <button class="btn btn-danger delete" data-id="${habit.id}">Delete</button>
+              </div>
             </div>
           </div>
+          ${habit.lastRenewal ? `
+            <div class="text-muted mt-2">
+              <small>Last renewed: ${new Date(habit.lastRenewal).toLocaleDateString()}</small>
+            </div>
+          ` : ''}
         </div>
       </div>
     `).join('');
@@ -101,36 +132,117 @@ export default class HabitView {
     });
   }
 
-  renderChart(habits) {
-    if (habits.length === 0) return;
+  renderChart(habits, graphData) {
+    const chartContainer = document.getElementById('chart-container');
+    chartContainer.innerHTML = `
+        <canvas id="habit-chart"></canvas>
+        <button id="clear-graph" class="btn btn-warning mt-3">Clear Graph</button>
+    `;
 
-    const existingChart = Chart.getChart(this.chart);
-    if (existingChart) {
-      existingChart.destroy();
+    const ctx = document.getElementById('habit-chart').getContext('2d');
+    
+    const allHabits = [...habits, ...(graphData || [])];
+    
+    if (allHabits.length === 0) {
+      chartContainer.innerHTML = `
+          <p>No habits to display in the graph yet.</p>
+          <button id="clear-graph" class="btn btn-warning mt-3" disabled>Clear Graph</button>
+      `;
+      return;
     }
 
-    const ctx = this.chart.getContext('2d');
+    const data = {
+        labels: allHabits.map(habit => habit.name),
+        datasets: [{
+            label: 'Progress',
+            data: allHabits.map(habit => 
+                habit.type === 'increment' ? (habit.progress || 0) : 
+                (habit.progress ? habit.progress.length : 0)
+            ),
+            backgroundColor: allHabits.map(habit => 
+                habit.completedDate ? 'rgba(75, 192, 192, 0.2)' : 'rgba(54, 162, 235, 0.2)'
+            ),
+            borderColor: allHabits.map(habit => 
+                habit.completedDate ? '#fff234': '#fff567'
+            ),
+            borderWidth: 1
+        }]
+    };
+
     new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: [...Array(7)].map((_, i) => {
-          const d = new Date();
-          d.setDate(d.getDate() - i);
-          return d.toLocaleDateString();
-        }).reverse(),
-        datasets: habits.map(habit => ({
-          label: habit.name,
-          data: habit.type === 'increment' ? [habit.progress / habit.goal] : habit.progress.map(p => (p.completed ? 1 : 0)),
-          fill: false,
-          tension: 0.1
-        }))
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          // ...existing options...
+        type: 'bar',
+        data: data,
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
         }
-      }
     });
+
+    const clearGraphBtn = document.getElementById('clear-graph');
+    if (clearGraphBtn) {
+      clearGraphBtn.addEventListener('click', () => {
+          document.dispatchEvent(new CustomEvent('clearGraph'));
+      });
+    }
+  }
+
+  renderCompletedHabits(completedHabits) {
+    if (completedHabits.length === 0) {
+      this.completedTasksDiv.innerHTML = '<h2>Completed Habits</h2><p>No completed habits yet</p>';
+      return;
+    }
+
+    const content = `
+        <h2>Completed Habits</h2>
+        ${completedHabits.map(habit => `
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="card-title">${habit.name}</h5>
+                            <p class="card-text">
+                                Completed on: ${new Date(habit.completedDate).toLocaleDateString()}
+                                ${habit.frequency !== 'once' ? '<br>(Recurring)' : ''}
+                            </p>
+                        </div>
+                        <button class="btn btn-danger delete-completed" data-id="${habit.id}">
+                            Delete ${habit.frequency !== 'once' ? '& Stop Recurring' : ''}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `).join('')}
+        <button id="Clear-button" class="btn btn-danger">Clear All Completed</button>
+    `;
+    
+    this.completedTasksDiv.innerHTML = content;
+    this.initCompletedTasksListeners();
+  }
+
+initCompletedTasksListeners() {
+
+    const clearButton = document.getElementById('Clear-button');
+    if (clearButton) {
+        clearButton.addEventListener('click', () => {
+            document.dispatchEvent(new CustomEvent('clearCompleted'));
+        });
+    }
+
+    const deleteButtons = document.querySelectorAll('.delete-completed');
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const id = parseInt(button.dataset.id);
+            document.dispatchEvent(new CustomEvent('deleteCompleted', { 
+                detail: { id }
+            }));
+        });
+    });
+  }
+
+  hideCompletedTasks() {
+    this.completedTasksDiv.innerHTML = '<h2>Completed Habits</h2><p>No completed habits yet</p>';
   }
 }

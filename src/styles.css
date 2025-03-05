@@ -1,30 +1,158 @@
 #app {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+body {
+  background-color: #fdfdfd
+}
+
+header{
+  background-color: #fff567;
+  color: #000;
+  padding: 10px 0;
+  width: 100%;
+  height: 90px;
+  text-align: center;
+  margin-bottom: 5px;
+}
   
-  #habit-form {
-    width: 100%;
-    max-width: 600px;
-    margin-bottom: 20px;
-  }
+#habit-form {
+  width: 100%;
+  max-width: 600px;
+  margin-bottom: 20px;
+  background-color: #f8f9fac0;
+}
   
-  #habits-list {
-    width: 100%;
-    max-width: 600px;
-    margin-bottom: 20px;
-  }
+#habits-list {
+  width: 100%;
+  max-width: 600px;
+  margin-bottom: 20px;
+}
   
-  #chart-container {
-    width: 100%;
-    max-width: 600px;
-    margin-bottom: 20px;
-    display: flex;
-    justify-content: center;
-  }
+#chart-container {
+  width: 100%;
+  max-width: 600px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+}
   
-  #habit-chart {
-    width: 100%;
-    max-width: 400px;
-  }
+#habit-chart {
+  width: 100%;
+  max-width: 100%;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+  
+.modal.show {
+  display: block;
+}
+  
+#Clear-button {
+  margin-top: 10px;
+  padding: 5px 10px;
+  background-color: #fff234;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.container {
+  display: flex;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  gap: 20px;
+  padding: 20px;
+}
+
+.column {
+  flex: 1;
+  min-width: 0;
+  background-color: #f8f9fac0;
+}
+
+.main-column {
+  flex: 2;
+  background-color: #f8f9fac0;
+}
+
+.completed-column {
+  flex: 1;
+  background-color: #f8f9fac0;
+  border-radius: 8px;
+  padding: 20px;
+  height: fit-content;
+  margin-left: 50px;
+}
+
+#CompletedTask {
+  position: static;
+  display: block;
+  transform: none;
+  box-shadow: none;
+  max-height: none;
+  overflow-y: visible;
+}
+
+#CompletedTask.show {
+  display: block;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.card {
+  margin-bottom: 15px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+#habit-form, #habits-list, #chart-container {
+  width: 100%;
+  max-width: 100%;
+}
+
+.delete-completed {
+  padding: 5px 10px;
+  font-size: 0.9em;
+  margin-left: 10px;
+}
+
+.card-body .d-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#clear-graph {
+  display: block;
+  margin: 10px auto;
+  padding: 8px 16px;
+  background-color: #fff567;
+  border: none;
+  border-radius: 4px;
+  color: #000;
+  cursor: pointer;
+}
+
+#clear-graph:hover {
+  background-color: #fff567;
+}
